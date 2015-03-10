@@ -30,10 +30,13 @@ int in_x = 0;
 
 int outbuffer [bufferlen];
 int out_x = 0;
+int out_byte;
+int out_ready = 0;
 
 void setup() {
     send_ser = false;
     fresh_in = 0;
+    number = 7;
     //---------------------------
     //Timer ISR stuff
     //TCCR0A = _BV(COM0A1) | _BV(COM0B1) | 
@@ -102,10 +105,24 @@ void read_i2c_buffer() {
 }
 
 void write_i2c_case1(){
-  Wire.write(1);
-  SendTwoByteInt(nISR);
-  SendTwoByteInt(v_out);
-  Wire.write(10);
+  unsigned char nlsb, nmsb, vlsb, vmsb;
+  out_ready = 0;
+  outbuffer[0] = 0;
+
+  nlsb = (unsigned char)nISR;
+  nmsb = getsecondbyte(nISR);
+  outbuffer[1] = nmsb;
+  outbuffer[2] = nlsb;
+
+  vlsb = (unsigned char)v_out;
+  vmsb = getsecondbyte(v_out);
+  outbuffer[3] = vmsb;
+  outbuffer[4] = vlsb;
+
+  outbuffer[5] = 10;
+  outbuffer[0] = 1;
+  out_ready = 1;
+  out_x = 0;
 }
 
 void loop() {
@@ -113,13 +130,14 @@ void loop() {
 
     if (fresh_in > 0){
         //new data has arrived
+        //pause i2c transmission from Arduino:
+        turn_off_transmit();
 	read_i2c_buffer();
         fresh_in = 0;
-        Serial.print("data received: ");
-        for (i=0; i<bufferlen; i++){
-	    Serial.println(inbuffer[i]);
-        }
-	fresh_out = 1;
+        /* Serial.print("data received: "); */
+        /* for (i=0; i<bufferlen; i++){ */
+	/*     Serial.println(inbuffer[i]); */
+        /* } */
     }
 
     if (fresh_out > 0){
@@ -143,31 +161,12 @@ int reassemblebytes(unsigned char msb, unsigned char lsb){
     return output;
 }
 
-int readtwobytes(void){
-    unsigned char msb, lsb;
-    int output;
-    int iter = 0;
-    while (Serial.available() <2){
-      iter++;
-      if (iter > 1e5){
-	break;
-      }
-    }
-    msb = Serial.read();
-    lsb = Serial.read();
-    output = reassemblebytes(msb, lsb);
-    return output;
+
+void turn_off_transmit(){
+  out_x = 0;
+  outbuffer[0] = 0;
+  out_ready = 0;
 }
-
-void SendTwoByteInt(int intin){
-    unsigned char lsb, msb;
-    lsb = (unsigned char)intin;
-    msb = getsecondbyte(intin);
-    Wire.write(msb);
-    Wire.write(lsb);
-}
-
-
 
 // callback for received data
 void receiveData(int byteCount){
@@ -196,7 +195,16 @@ void receiveData(int byteCount){
 
 // callback for sending data
 void sendData(){
-    Wire.write(number);
+    out_byte = outbuffer[out_x];
+    Wire.write(out_byte);
+    //if the first byte is a zero, we haven't really 
+    //loaded the buffer
+    if ((out_byte > 0) and (out_x > 0)){
+	out_x++;
+    }
+    else{
+	delayMicroseconds(10);
+    }
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -204,5 +212,6 @@ ISR(TIMER1_COMPA_vect)
   nISR++;
   //analogWrite(pwmA, v1);
   v_out = v1*v1;
-  //fresh = 1;
+  fresh_out = 1;
+  out_ready = 0;
 }

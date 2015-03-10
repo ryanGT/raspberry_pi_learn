@@ -21,6 +21,12 @@ def read_N_bytes(N):
     list_out = []
     for i in range(N):
         number = bus.read_byte(address)
+        while (i == 0) and (number == 0):
+            #first entry must be a case number higher than 0
+            #  - if case is 0, the buffer wasn't ready for
+            #    reading
+            number = bus.read_byte(address)
+            
         list_out.append(number)
 
     return list_out
@@ -32,6 +38,27 @@ def send_list(listin):
 
     echo_list = read_N_bytes(6)
     return echo_list
+
+
+
+def two_bytes(intin):
+    intin = int(intin)
+    msb = intin/256
+    lsb = intin-msb*256
+    return msb, lsb
+
+
+N = 10
+big_list = []
+
+for i in range(10):
+    v = i
+    nmsb, nlsb = two_bytes(i)
+    vmsb, vlsb = two_bytes(v)
+    row_out = [1,nmsb,nlsb,vmsb,vlsb,10]
+    send_list(row_out)
+    row_in = read_N_bytes(6)
+    big_list.append(row_in)
 
 ## while True:
 ##     var = input("Enter 1 - 9: ")

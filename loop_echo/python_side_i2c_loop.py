@@ -26,6 +26,8 @@ def read_N_bytes(N):
             #  - if case is 0, the buffer wasn't ready for
             #    reading
             number = bus.read_byte(address)
+            if i > 100:
+                break
             
         list_out.append(number)
 

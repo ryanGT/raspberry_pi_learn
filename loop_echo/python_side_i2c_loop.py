@@ -48,17 +48,20 @@ def two_bytes(intin):
     return msb, lsb
 
 
-N = 10
-big_list = []
+def loop_test():
+    N = 10
+    big_list = []
 
-for i in range(10):
-    v = i
-    nmsb, nlsb = two_bytes(i)
-    vmsb, vlsb = two_bytes(v)
-    row_out = [1,nmsb,nlsb,vmsb,vlsb,10]
-    send_list(row_out)
-    row_in = read_N_bytes(6)
-    big_list.append(row_in)
+    for i in range(10):
+        v = i
+        nmsb, nlsb = two_bytes(i)
+        vmsb, vlsb = two_bytes(v)
+        row_out = [1,nmsb,nlsb,vmsb,vlsb,10]
+        send_list(row_out)
+        row_in = read_N_bytes(6)
+        big_list.append(row_in)
+
+    return big_list
 
 ## while True:
 ##     var = input("Enter 1 - 9: ")

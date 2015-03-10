@@ -8,6 +8,9 @@
 #define packetlen 6
 #define nlindex 5
 
+#define receivePin 7
+#define sendPin 8
+
 int number = 0;
 int state = 0;
 
@@ -70,6 +73,12 @@ void setup() {
     TCCR0B = (TCCR0B & mask) | prescale;
     //----------------------
     pinMode(13, OUTPUT);
+    pinMode(sendPin, OUTPUT);
+    pinMode(receivePin, OUTPUT);
+
+    digitalWrite(receivePin, LOW);
+    digitalWrite(sendPin, LOW);
+
     Serial.begin(115200);         // start serial for output
     // initialize i2c as slave
     Wire.begin(SLAVE_ADDRESS);
@@ -130,6 +139,7 @@ void loop() {
 
     if (fresh_in > 0){
         //new data has arrived
+        digitalWrite(receivePin, HIGH);
         //pause i2c transmission from Arduino:
         turn_off_transmit();
 	read_i2c_buffer();
@@ -138,6 +148,7 @@ void loop() {
         /* for (i=0; i<bufferlen; i++){ */
 	/*     Serial.println(inbuffer[i]); */
         /* } */
+	digitalWrite(receivePin, LOW);
     }
 
     if (fresh_out > 0){

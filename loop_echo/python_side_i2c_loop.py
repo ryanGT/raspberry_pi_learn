@@ -38,8 +38,8 @@ def send_list(listin):
     for item in listin:
         writeNumber(item)
 
-    echo_list = read_N_bytes(6)
-    return echo_list
+    ## echo_list = read_N_bytes(6)
+    ## return echo_list
 
 
 

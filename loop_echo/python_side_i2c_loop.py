@@ -30,6 +30,9 @@ def send_list(listin):
     for item in listin:
         writeNumber(item)
 
+    echo_list = read_N_bytes(6)
+    return echo_list
+
 ## while True:
 ##     var = input("Enter 1 - 9: ")
 ##     if not var:

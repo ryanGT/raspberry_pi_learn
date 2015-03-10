@@ -79,7 +79,7 @@ void setup() {
     Wire.onRequest(sendData);
 
     sei();
-    Serial.println("i2c krauss buffer v0.1");
+    Serial.println("i2c krauss buffer v0.2");
 }
 
 void read_i2c_buffer() {
@@ -199,11 +199,11 @@ void sendData(){
     Wire.write(out_byte);
     //if the first byte is a zero, we haven't really 
     //loaded the buffer
-    if ((out_byte > 0) and (out_x > 0)){
-	out_x++;
+    if ((out_byte == 0) and (out_x == 0)){
+	delayMicroseconds(10);
     }
     else{
-	delayMicroseconds(10);
+	out_x++;
     }
 }
 

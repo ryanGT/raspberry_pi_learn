@@ -1,7 +1,13 @@
 #include "Wire.h"
 
 #define SLAVE_ADDRESS 0x04
-#define bufferlen 10
+#define bufferlen 20
+//expect i2c data packets that contain 6 bytes
+//with the newline character in the last position
+//i.e. index 5
+#define packetlen 6
+#define nlindex 5
+
 int number = 0;
 int state = 0;
 
@@ -14,8 +20,9 @@ int nISR;
 int v1;
 int v_out;
 
-int inByte;
-int fresh;
+int case_in;
+int fresh_in;
+int fresh_out;
 bool send_ser;
 
 int inbuffer [bufferlen];
@@ -26,7 +33,7 @@ int out_x = 0;
 
 void setup() {
     send_ser = false;
-
+    fresh_in = 0;
     //---------------------------
     //Timer ISR stuff
     //TCCR0A = _BV(COM0A1) | _BV(COM0B1) | 
@@ -69,19 +76,55 @@ void setup() {
     Wire.onRequest(sendData);
 
     sei();
-    Serial.println("sup yo?");
+    Serial.println("i2c krauss buffer v0.1");
+}
+
+void read_i2c_buffer() {
+  //the last data byte must be set to something other than zero
+  //to mark transmission as complete
+  while (inbuffer[nlindex] == 0){
+    delayMicroseconds(10);
+  }
+  case_in = inbuffer[0];
+  if (case_in  == 1){
+    //read nIn and v1 as part of a normal time step
+    nIn = reassemblebytes(inbuffer[1], inbuffer[2]);
+    v1 = reassemblebytes(inbuffer[3], inbuffer[4]);
+  }
+  else if (case_in == 2){
+    //start new test
+    nISR = 0;
+  }
+  
+  //reset inbuffer as clear and ready for new data
+  inbuffer[nlindex] = 0;
+  in_x = 0;
+}
+
+void write_i2c_case1(){
+  Wire.write(1);
+  SendTwoByteInt(nISR);
+  SendTwoByteInt(v_out);
+  Wire.write(10);
 }
 
 void loop() {
     int i;
-    delay(10);
 
-    if (inbuffer[0] > 0){
+    if (fresh_in > 0){
         //new data has arrived
+	read_i2c_buffer();
+        fresh_in = 0;
         Serial.print("data received: ");
         for (i=0; i<bufferlen; i++){
 	    Serial.println(inbuffer[i]);
         }
+	fresh_out = 1;
+    }
+
+    if (fresh_out > 0){
+      write_i2c_case1();
+      fresh_out = 0;
     }
 }
 
@@ -120,19 +163,20 @@ void SendTwoByteInt(int intin){
     unsigned char lsb, msb;
     lsb = (unsigned char)intin;
     msb = getsecondbyte(intin);
-    Serial.write(msb);
-    Serial.write(lsb);
+    Wire.write(msb);
+    Wire.write(lsb);
 }
 
 
 
 // callback for received data
 void receiveData(int byteCount){
-    int x = 0;
+  //int x = 0;
 
     while(Wire.available()) {
-        inbuffer[x] = Wire.read();
-        x++;
+        inbuffer[in_x] = Wire.read();
+        in_x++;
+	fresh_in = 1;
         //Serial.print("data received: ");
         //Serial.println(number);
 
@@ -160,5 +204,5 @@ ISR(TIMER1_COMPA_vect)
   nISR++;
   //analogWrite(pwmA, v1);
   v_out = v1*v1;
-  fresh = 1;
+  //fresh = 1;
 }

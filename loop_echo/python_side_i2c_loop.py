@@ -17,6 +17,15 @@ def readNumber():
     return number
 
 
+def read_N_bytes(N):
+    list_out = []
+    for i in range(N):
+        number = bus.read_byte(address)
+        list_out.append(number)
+
+    return list_out
+
+
 def send_list(listin):
     for item in listin:
         writeNumber(item)

@@ -16,16 +16,21 @@ def readNumber():
     # number = bus.read_byte_data(address, 1)
     return number
 
-while True:
-    var = input("Enter 1 - 9: ")
-    if not var:
-        continue
 
-    writeNumber(var)
-    print "RPI: Hi Arduino, I sent you ", var
-    # sleep one second
-    time.sleep(1)
+def send_list(listin):
+    for item in listin:
+        writeNumber(item)
 
-    number = readNumber()
-    print "Arduino: Hey RPI, I received a digit ", number
-    print
+## while True:
+##     var = input("Enter 1 - 9: ")
+##     if not var:
+##         continue
+
+##     writeNumber(var)
+##     print "RPI: Hi Arduino, I sent you ", var
+##     # sleep one second
+##     time.sleep(1)
+
+##     number = readNumber()
+##     print "Arduino: Hey RPI, I received a digit ", number
+##     print

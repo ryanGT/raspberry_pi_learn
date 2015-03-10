@@ -21,11 +21,11 @@ def read_N_bytes(N):
     list_out = []
     for i in range(N):
         number = bus.read_byte(address)
-        ## while (i == 0) and (number == 0):
-        ##     #first entry must be a case number higher than 0
-        ##     #  - if case is 0, the buffer wasn't ready for
-        ##     #    reading
-        ##     number = bus.read_byte(address)
+        while (i == 0) and (number == 0):
+            #first entry must be a case number higher than 0
+            #  - if case is 0, the buffer wasn't ready for
+            #    reading
+            number = bus.read_byte(address)
             
         list_out.append(number)
 

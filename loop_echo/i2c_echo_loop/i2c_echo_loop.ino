@@ -199,11 +199,8 @@ void sendData(){
     Wire.write(out_byte);
     //if the first byte is a zero, we haven't really 
     //loaded the buffer
-    if ((out_byte == 0) and (out_x == 0)){
-	delayMicroseconds(10);
-    }
-    else{
-	out_x++;
+    if ((out_byte > 0) or (out_x > 0)){
+	out_x++;      
     }
 }
 

@@ -28,7 +28,7 @@ int fresh_in;
 int fresh_out;
 bool send_ser;
 
-int inbuffer [bufferlen];
+byte inbuffer [bufferlen];
 int in_x = 0;
 
 int outbuffer [bufferlen];
@@ -88,14 +88,14 @@ void setup() {
     Wire.onRequest(sendData);
 
     sei();
-    Serial.println("i2c krauss buffer v0.2");
+    Serial.println("i2c krauss buffer v0.2.1");
 }
 
 void read_i2c_buffer() {
   //the last data byte must be set to something other than zero
   //to mark transmission as complete
   while (inbuffer[nlindex] == 0){
-    delayMicroseconds(10);
+    delayMicroseconds(3);
   }
   case_in = inbuffer[0];
   if (case_in  == 1){

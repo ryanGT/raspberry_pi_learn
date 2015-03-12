@@ -4,6 +4,19 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
+
+import smbus
+import time
+import subprocess
+# for RPI version 1, use "bus = smbus.SMBus(0)"
+bus = smbus.SMBus(1)
+
+# This is the address we setup in the Arduino Program
+address = 0x04
+
+def send_list(listin):
+    bus.write_i2c_block_data(address, listin[0], listin[1:])
+
 import serial
 ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 ser.open()
@@ -37,7 +50,8 @@ print "wasting resources by polling for a button press.\n"
 print "Press your button when ready to initiate a falling edge interrupt."
 try:
     GPIO.wait_for_edge(23, my_edge)
-    ser.write("test")
+    #ser.write("test")
+    send_list([1,2,3,4])
     print msg1
     print "whatever was waiting for a button press."
 except KeyboardInterrupt:

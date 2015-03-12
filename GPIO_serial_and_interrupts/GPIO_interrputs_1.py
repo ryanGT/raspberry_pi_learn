@@ -4,6 +4,10 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
+import serial
+ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+ser.open()
+
 case = 2
 # GPIO 23 set up as input. It is pulled up to stop false signals
 pat1 = "\n %s edge detected. Now your program can continue with"
@@ -33,8 +37,11 @@ print "wasting resources by polling for a button press.\n"
 print "Press your button when ready to initiate a falling edge interrupt."
 try:
     GPIO.wait_for_edge(23, my_edge)
+    ser.write("test")
     print msg1
     print "whatever was waiting for a button press."
 except KeyboardInterrupt:
     GPIO.cleanup()       # clean up GPIO on CTRL+C exit
 GPIO.cleanup()           # clean up GPIO on normal exit
+
+ser.close()

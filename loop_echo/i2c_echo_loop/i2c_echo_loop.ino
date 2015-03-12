@@ -1,11 +1,11 @@
 #include "Wire.h"
 
 #define SLAVE_ADDRESS 0x04
-#define bufferlen 20
+#define bufferlen 10
 //expect i2c data packets that contain 6 bytes
 //with the newline character in the last position
 //i.e. index 5
-#define packetlen 6
+#define receivelen 6
 #define nlindex 5
 
 #define receivePin 7
@@ -28,7 +28,7 @@ int fresh_in;
 int fresh_out;
 bool send_ser;
 
-byte inbuffer [bufferlen];
+uint8_t inbuffer [bufferlen];
 int in_x = 0;
 
 int outbuffer [bufferlen];
@@ -139,22 +139,22 @@ void loop() {
 
     if (fresh_in > 0){
         //new data has arrived
-        digitalWrite(receivePin, HIGH);
+        //digitalWrite(receivePin, HIGH);
         //pause i2c transmission from Arduino:
-        turn_off_transmit();
-	read_i2c_buffer();
+        //turn_off_transmit();
+	//read_i2c_buffer();
         fresh_in = 0;
-        /* Serial.print("data received: "); */
-        /* for (i=0; i<bufferlen; i++){ */
-	/*     Serial.println(inbuffer[i]); */
-        /* } */
-	digitalWrite(receivePin, LOW);
+        Serial.print("data received: ");
+        for (i=0; i<bufferlen; i++){
+	    Serial.println(inbuffer[i]);
+        }
+	//digitalWrite(receivePin, LOW);
     }
 
-    if (fresh_out > 0){
-      write_i2c_case1();
-      fresh_out = 0;
-    }
+    /* if (fresh_out > 0){ */
+    /*   write_i2c_case1(); */
+    /*   fresh_out = 0; */
+    /* } */
 }
 
 unsigned char getsecondbyte(int input){
@@ -182,13 +182,27 @@ void turn_off_transmit(){
 // callback for received data
 void receiveData(int byteCount){
   //int x = 0;
+    Serial.print("byte count=");
+    Serial.println(byteCount);
+
+    //Serial.print("in_x=");
+    //Serial.println(in_x);
+
+    //Serial.print("data received: ");
+
+    digitalWrite(receivePin, HIGH);
+
+    in_x = 0;
 
     while(Wire.available()) {
         inbuffer[in_x] = Wire.read();
+        //Serial.println(inbuffer[in_x]);
         in_x++;
-	fresh_in = 1;
-        //Serial.print("data received: ");
-        //Serial.println(number);
+    }
+    
+    fresh_in = 1;
+
+    digitalWrite(receivePin, LOW);
 
         /* if (number == 1){ */
 
@@ -201,7 +215,6 @@ void receiveData(int byteCount){
         /*         state = 0; */
         /*     } */
         /*  } */
-    }
 }
 
 // callback for sending data

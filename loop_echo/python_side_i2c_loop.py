@@ -35,8 +35,9 @@ def read_N_bytes(N):
 
 
 def send_list(listin):
-    for item in listin:
-        writeNumber(item)
+    bus.write_i2c_block_data(address, listin[0], listin[1:])
+    ## for item in listin:
+    ##     writeNumber(item)
 
     ## echo_list = read_N_bytes(6)
     ## return echo_list

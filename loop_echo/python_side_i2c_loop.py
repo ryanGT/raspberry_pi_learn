@@ -34,6 +34,11 @@ def read_N_bytes(N):
     return list_out
 
 
+def read_block_N(N=5):
+    mylist = bus.read_block_data(address,N)
+    return mylist
+
+
 def send_list(listin):
     bus.write_i2c_block_data(address, listin[0], listin[1:])
     ## for item in listin:

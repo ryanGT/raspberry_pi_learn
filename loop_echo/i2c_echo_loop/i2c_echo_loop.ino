@@ -6,6 +6,7 @@
 //with the newline character in the last position
 //i.e. index 5
 #define receivelen 6
+#define sendlen 5
 #define nlindex 5
 
 #define receivePin 7
@@ -30,8 +31,9 @@ bool send_ser;
 
 uint8_t inbuffer [bufferlen];
 int in_x = 0;
+int bytesin;
 
-int outbuffer [bufferlen];
+uint8_t outbuffer [sendlen];
 int out_x = 0;
 int out_byte;
 int out_ready = 0;
@@ -88,7 +90,7 @@ void setup() {
     Wire.onRequest(sendData);
 
     sei();
-    Serial.println("i2c krauss buffer v0.2.1");
+    Serial.println("i2c krauss buffer v0.2.2");
 }
 
 void read_i2c_buffer() {
@@ -144,6 +146,9 @@ void loop() {
         //turn_off_transmit();
 	//read_i2c_buffer();
         fresh_in = 0;
+	Serial.print("bytesin: ");
+	Serial.println(bytesin);
+
         Serial.print("data received: ");
         for (i=0; i<bufferlen; i++){
 	    Serial.println(inbuffer[i]);
@@ -182,8 +187,8 @@ void turn_off_transmit(){
 // callback for received data
 void receiveData(int byteCount){
   //int x = 0;
-    Serial.print("byte count=");
-    Serial.println(byteCount);
+    //Serial.print("byte count=");
+    //Serial.println(byteCount);
 
     //Serial.print("in_x=");
     //Serial.println(in_x);
@@ -191,7 +196,7 @@ void receiveData(int byteCount){
     //Serial.print("data received: ");
 
     digitalWrite(receivePin, HIGH);
-
+    bytesin = byteCount;
     in_x = 0;
 
     while(Wire.available()) {
@@ -219,13 +224,24 @@ void receiveData(int byteCount){
 
 // callback for sending data
 void sendData(){
-    out_byte = outbuffer[out_x];
-    Wire.write(out_byte);
-    //if the first byte is a zero, we haven't really 
-    //loaded the buffer
-    if ((out_byte > 0) or (out_x > 0)){
-	out_x++;      
-    }
+    unsigned char nlsb, nmsb, vlsb, vmsb;
+
+    digitalWrite(sendPin, HIGH);
+    nlsb = (unsigned char)nISR;
+    //nmsb = getsecondbyte(nISR);
+    outbuffer[0] = nlsb;
+
+    vlsb = (unsigned char)v_out;
+    vmsb = getsecondbyte(v_out);
+    outbuffer[1] = vmsb;
+    outbuffer[2] = vlsb;
+
+    outbuffer[3] = 5;
+    outbuffer[4] = 10;
+
+    Wire.write(outbuffer, sendlen);
+
+    digitalWrite(sendPin, LOW);
 }
 
 ISR(TIMER1_COMPA_vect)

@@ -11,8 +11,10 @@ import serial_utils
 #lefthand side for me
 #portname = '/dev/tty.usbmodem1421'
 
-#ser = serial_utils.Open_Serial(portname)
-from myserial import ser
+portname = '/dev/ttyACM0'
+
+ser = serial_utils.Open_Serial(portname)
+#from myserial import ser
 ser.flushInput()
 ser.flushOutput()
 

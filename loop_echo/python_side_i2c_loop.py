@@ -1,5 +1,6 @@
 import smbus
 import time
+import subprocess
 # for RPI version 1, use "bus = smbus.SMBus(0)"
 bus = smbus.SMBus(1)
 
@@ -70,6 +71,24 @@ def loop_test():
         big_list.append(row_in)
 
     return big_list
+
+
+def my_block_read(N=6):
+    dataout = []
+    for i in range(50):
+        try:
+            #bus.read_i2c_block_data(address,6,6)
+            dataout = bus.read_i2c_block_data(address, N, N)
+            break
+        except IOError:
+            #subprocess.call(['i2cdetect', '-y', '1'])
+            time.sleep(1.0e-4)
+            flag = 1     #optional flag to signal your code to resend or something
+    
+    return dataout, i
+             
+        
+       
 
 ## while True:
 ##     var = input("Enter 1 - 9: ")

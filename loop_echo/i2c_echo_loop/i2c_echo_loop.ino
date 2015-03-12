@@ -6,7 +6,7 @@
 //with the newline character in the last position
 //i.e. index 5
 #define receivelen 6
-#define sendlen 5
+#define sendlen 6
 #define nlindex 5
 
 #define receivePin 7
@@ -51,10 +51,10 @@ void setup() {
     TCCR1B = 0;     // same for TCCR1B
 
     // set compare match register to desired timer count:
-    //OCR1A = 15624;
+    OCR1A = 15624;
     //OCR1A = 155;//100 Hz
     //OCR1A = 100;//150ish - seems to work
-    OCR1A = 77;//200 Hz <-- seems very borderline (might be 184 Hz)
+    //OCR1A = 77;//200 Hz <-- seems very borderline (might be 184 Hz)
     //OCR1A = 30;//500 Hz
     //OCR1A = 15;//1000 Hz
     //OCR1A = 7;//2000 Hz
@@ -90,7 +90,7 @@ void setup() {
     Wire.onRequest(sendData);
 
     sei();
-    Serial.println("i2c krauss buffer v0.2.2");
+    Serial.println("i2c krauss buffer v0.2.3.1 3/12/15");
 }
 
 void read_i2c_buffer() {
@@ -139,6 +139,8 @@ void write_i2c_case1(){
 void loop() {
     int i;
 
+    delay(100);
+
     if (fresh_in > 0){
         //new data has arrived
         //digitalWrite(receivePin, HIGH);
@@ -146,13 +148,13 @@ void loop() {
         //turn_off_transmit();
 	//read_i2c_buffer();
         fresh_in = 0;
-	Serial.print("bytesin: ");
-	Serial.println(bytesin);
+	/* Serial.print("bytesin: "); */
+	/* Serial.println(bytesin); */
 
-        Serial.print("data received: ");
-        for (i=0; i<bufferlen; i++){
-	    Serial.println(inbuffer[i]);
-        }
+        /* Serial.print("data received: "); */
+        /* for (i=0; i<bufferlen; i++){ */
+	/*     Serial.println(inbuffer[i]); */
+        /* } */
 	//digitalWrite(receivePin, LOW);
     }
 
@@ -238,6 +240,8 @@ void sendData(){
 
     outbuffer[3] = 5;
     outbuffer[4] = 10;
+    
+    outbuffer[5] = 0;
 
     Wire.write(outbuffer, sendlen);
 
@@ -248,7 +252,7 @@ ISR(TIMER1_COMPA_vect)
 {     
   nISR++;
   //analogWrite(pwmA, v1);
-  v_out = v1*v1;
-  fresh_out = 1;
-  out_ready = 0;
+  //v_out = v1*v1;
+  //fresh_out = 1;
+  //out_ready = 0;
 }

@@ -18,7 +18,19 @@ def send_list(listin):
     bus.write_i2c_block_data(address, listin[0], listin[1:])
 
 import serial
-ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+
+port_case = 2
+
+# Question: is the latency different between these two?
+#
+# - if so, this seems like a clear indicator that GPIO serial should be better
+# - if not, run the echo testing using GPIO interrupts and see what happens
+if port_case == 1:
+    portname = '/dev/ttyAMA0'#GPIO
+elif port_case == 2:
+    portname = '/dev/ttyACM0'#USB
+
+ser = serial.Serial(portname, 115200, timeout=1)
 ser.open()
 
 case = 2

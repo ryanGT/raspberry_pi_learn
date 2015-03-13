@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
-case = 2
+case = 1
 if case == 1:
     portname = '/dev/ttyAMA0'
 elif case == 2:
@@ -11,6 +11,8 @@ elif case == 2:
 import serial
 ser = serial.Serial(portname, 115200, timeout=1)
 ser.open()
+
+import serial_utils
 
 if case == 2:
     debug_line = serial_utils.Read_Line(ser)
@@ -48,7 +50,6 @@ import time, copy, os
 ser.flushInput()
 ser.flushOutput()
 
-import serial_utils
 
 #debug_line = serial_utils.Read_Line(ser)
 #line_str = ''.join(debug_line)
@@ -85,6 +86,17 @@ serial_utils.Close_Serial(ser)
 
 if case == 2:
     print(line_str)
+
+neg_inds = where(v_echo < 0)[0]
+v_echo[neg_inds] += 2**16
+
+test_vect = v1**2-v_echo
+
+if test_vect.any():
+    print('some failures:')
+    print(test_vect)
+else:
+    print('no failures')
 
 figure(1)
 clf()

@@ -1,10 +1,20 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
-portname = '/dev/ttyAMA0'
+case = 2
+if case == 1:
+    portname = '/dev/ttyAMA0'
+elif case == 2:
+    #USB
+    portname = '/dev/ttyACM0'
+    
 import serial
 ser = serial.Serial(portname, 115200, timeout=1)
 ser.open()
+
+if case == 2:
+    debug_line = serial_utils.Read_Line(ser)
+    line_str = ''.join(debug_line)
 
 from matplotlib.pyplot import *
 from numpy import *
@@ -73,7 +83,8 @@ serial_utils.WriteByte(ser, 3)#stop test
 
 serial_utils.Close_Serial(ser)
 
-#print(line_str)
+if case == 2:
+    print(line_str)
 
 figure(1)
 clf()

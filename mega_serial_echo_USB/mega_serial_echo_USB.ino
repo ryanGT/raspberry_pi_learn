@@ -26,10 +26,10 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.print("mega serial1 echo test 115200");
+  Serial.print("mega serial1 echo test USB");
   Serial.print("\n");
 
-  Serial1.begin(115200);
+  //Serial1.begin(115200);
 
   send_ser = false;
 
@@ -101,14 +101,14 @@ int readtwobytes(void){
     unsigned char msb, lsb;
     int output;
     int iter = 0;
-    while (Serial1.available() <2){
+    while (Serial.available() <2){
       iter++;
       if (iter > 1e5){
 	break;
       }
     }
-    msb = Serial1.read();
-    lsb = Serial1.read();
+    msb = Serial.read();
+    lsb = Serial.read();
     output = reassemblebytes(msb, lsb);
     return output;
 }
@@ -117,16 +117,16 @@ void SendTwoByteInt(int intin){
     unsigned char lsb, msb;
     lsb = (unsigned char)intin;
     msb = getsecondbyte(intin);
-    Serial1.write(msb);
-    Serial1.write(lsb);
+    Serial.write(msb);
+    Serial.write(lsb);
 }
 
 
 
 void loop()
 {
-  if (Serial1.available() > 0) {
-    inByte = Serial1.read();
+  if (Serial.available() > 0) {
+    inByte = Serial.read();
     if (inByte == 1){
       //main control case
       //send_ser = true;
@@ -150,7 +150,7 @@ void loop()
       //send_ser = false;
       SendTwoByteInt(nISR);
       SendTwoByteInt(v_out);
-      Serial1.write(10);
+      Serial.write(10);
     }
     if (nISR > 500){
       send_ser = false;

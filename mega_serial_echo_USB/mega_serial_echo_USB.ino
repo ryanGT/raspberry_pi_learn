@@ -58,9 +58,11 @@ void setup()
   // set compare match register to desired timer count:
   //OCR1A = 15624;
   //OCR1A = 155;//100 Hz
-  //OCR1A = 100;//150ish - seems to work
+  OCR1A = 100;//150ish - seems to work
   //OCR1A = 77;//200 Hz <-- seems very borderline (might be 184 Hz)
-  OCR1A = 30;//500 Hz
+  //OCR1A = 51;//300 Hz
+  //OCR1A = 38;//400 Hz
+  //OCR1A = 30;//500 Hz
   //OCR1A = 15;//1000 Hz
   //OCR1A = 7;//2000 Hz
 
@@ -126,7 +128,7 @@ void SendTwoByteInt(int intin){
 void loop()
 {
   if (Serial.available() > 0) {
-    digitalWrite(readPin, HIGH);
+    digitalWrite(receivePin, HIGH);
     inByte = Serial.read();
     if (inByte == 1){
       //main control case
@@ -143,7 +145,7 @@ void loop()
       send_ser = false;
       v1 = 0;
     }
-    digitalWrite(readPin, LOW);
+    digitalWrite(receivePin, LOW);
   }
   
   if (fresh > 0){

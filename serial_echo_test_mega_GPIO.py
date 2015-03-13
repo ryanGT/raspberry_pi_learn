@@ -2,6 +2,9 @@ from matplotlib.pyplot import *
 from numpy import *
 import numpy, time
 
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+
 import time, copy, os
 
 import serial_utils
@@ -10,6 +13,15 @@ import serial_utils
 #portname = '/dev/tty.usbmodem1411'
 #lefthand side for me
 #portname = '/dev/tty.usbmodem1421'
+
+# Question: is the latency different between these two?
+#
+# - if so, this seems like a clear indicator that GPIO serial should be better
+# - if not, run the echo testing using GPIO interrupts and see what happens
+if port_case == 1:
+    portname = '/dev/ttyAMA0'#GPIO
+elif port_case == 2:
+    portname = '/dev/ttyACM0'#USB
 
 portname = '/dev/ttyACM0'
 

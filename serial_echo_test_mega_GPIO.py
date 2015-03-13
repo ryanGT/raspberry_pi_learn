@@ -1,13 +1,17 @@
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+
+portname = '/dev/ttyAMA0'
+import serial
+ser = serial.Serial(portname, 115200, timeout=1)
+ser.open()
+
 from matplotlib.pyplot import *
 from numpy import *
 import numpy, time
 
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
 
 import time, copy, os
-
-import serial_utils
 
 #righthand side for me
 #portname = '/dev/tty.usbmodem1411'
@@ -18,20 +22,26 @@ import serial_utils
 #
 # - if so, this seems like a clear indicator that GPIO serial should be better
 # - if not, run the echo testing using GPIO interrupts and see what happens
-if port_case == 1:
-    portname = '/dev/ttyAMA0'#GPIO
-elif port_case == 2:
-    portname = '/dev/ttyACM0'#USB
+#port_case = 1
+#if port_case == 1:
+#    portname = '/dev/ttyAMA0'
+#elif port_case == 2:
+#    portname = '/dev/ttyACM0'#USB
 
-portname = '/dev/ttyACM0'
+#portname = '/dev/ttyACM0'
 
-ser = serial_utils.Open_Serial(portname)
+#ser = serial.Serial(portname, 115200, timeout=1)
+#ser.open()
+
+#ser = serial_utils.Open_Serial(portname)
 #from myserial import ser
 ser.flushInput()
 ser.flushOutput()
 
-debug_line = serial_utils.Read_Line(ser)
-line_str = ''.join(debug_line)
+import serial_utils
+
+#debug_line = serial_utils.Read_Line(ser)
+#line_str = ''.join(debug_line)
 
 #time.sleep(0.1)
 
@@ -63,7 +73,7 @@ serial_utils.WriteByte(ser, 3)#stop test
 
 serial_utils.Close_Serial(ser)
 
-print(line_str)
+#print(line_str)
 
 figure(1)
 clf()

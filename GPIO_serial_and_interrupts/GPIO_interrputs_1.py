@@ -19,7 +19,7 @@ def send_list(listin):
 
 import serial
 
-port_case = 2
+port_case = 1
 
 # Question: is the latency different between these two?
 #
@@ -62,8 +62,8 @@ print "wasting resources by polling for a button press.\n"
 print "Press your button when ready to initiate a falling edge interrupt."
 try:
     GPIO.wait_for_edge(23, my_edge)
-    #ser.write("test")
-    send_list([1,2,3,4])
+    ser.write("test")
+    #send_list([1,2,3,4])
     print msg1
     print "whatever was waiting for a button press."
 except KeyboardInterrupt:

@@ -61,15 +61,39 @@ print "During this waiting time, your computer is not"
 print "wasting resources by polling for a button press.\n"
 print "Press your button when ready to initiate a falling edge interrupt."
 
-N = 100
+N = 200
+
+nvect = zeros(N,dtype=int)
+v1 = arange(0,N)
+v_echo = zeros_like(nvect)
+
+serial_utils.WriteByte(ser, 2)#start new test
+
+
 for i in range(N):
     try:
         GPIO.wait_for_edge(23, my_edge)
-        ser.write(i)
+        serial_utils.WriteByte(ser, 1)#new n and voltage are coming
+        serial_utils.WriteInt(ser, i)
+        serial_utils.WriteInt(ser, v1[i])
+
+        nvect[i] = serial_utils.Read_Two_Bytes(ser)
+        v_echo[i] = serial_utils.Read_Two_Bytes_Twos_Comp(ser)
+        nl_check = serial_utils.Read_Byte(ser)
+        assert nl_check == 10, "newline problem"
+
+        #ser.write(i)
         #send_list([1,2,3,4])
     except KeyboardInterrupt:
         GPIO.cleanup()       # clean up GPIO on CTRL+C exit
-        
+
+
+time.sleep(0.1)
+serial_utils.WriteByte(ser, 3)#stop test
+time.sleep(0.1)
+serial_utils.WriteByte(ser, 3)#stop test
+
+
 GPIO.cleanup()           # clean up GPIO on normal exit
 
 ser.close()

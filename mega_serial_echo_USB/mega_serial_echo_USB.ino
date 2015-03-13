@@ -126,6 +126,7 @@ void SendTwoByteInt(int intin){
 void loop()
 {
   if (Serial.available() > 0) {
+    digitalWrite(readPin, HIGH);
     inByte = Serial.read();
     if (inByte == 1){
       //main control case
@@ -142,15 +143,18 @@ void loop()
       send_ser = false;
       v1 = 0;
     }
+    digitalWrite(readPin, LOW);
   }
   
   if (fresh > 0){
     fresh = 0;
     if (send_ser){
+      digitalWrite(sendPin, HIGH);
       //send_ser = false;
       SendTwoByteInt(nISR);
       SendTwoByteInt(v_out);
       Serial.write(10);
+      digitalWrite(sendPin, LOW);
     }
     if (nISR > 500){
       send_ser = false;
@@ -162,8 +166,10 @@ void loop()
 
 ISR(TIMER1_COMPA_vect)
 {     
+  digitalWrite(isrPin, HIGH);
   nISR++;
   //analogWrite(pwmA, v1);
   v_out = v1*v1;
   fresh = 1;
+  digitalWrite(isrPin, LOW);
 }

@@ -26,7 +26,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.print("mega serial1 echo test 115200");
+  Serial.print("mega serial1 echo test 115200 w/timing pins");
   Serial.print("\n");
 
   Serial1.begin(115200);
@@ -60,7 +60,9 @@ void setup()
   //OCR1A = 155;//100 Hz
   //OCR1A = 100;//150ish - seems to work
   //OCR1A = 77;//200 Hz <-- seems very borderline (might be 184 Hz)
-  OCR1A = 30;//500 Hz
+  OCR1A = 51;//300 Hz
+  //OCR1A = 38;//400 Hz
+  //OCR1A = 30;//500 Hz
   //OCR1A = 15;//1000 Hz
   //OCR1A = 7;//2000 Hz
 
@@ -126,6 +128,7 @@ void SendTwoByteInt(int intin){
 void loop()
 {
   if (Serial1.available() > 0) {
+    digitalWrite(receivePin, HIGH);
     inByte = Serial1.read();
     if (inByte == 1){
       //main control case
@@ -142,15 +145,18 @@ void loop()
       send_ser = false;
       v1 = 0;
     }
+    digitalWrite(receivePin, LOW);
   }
   
   if (fresh > 0){
     fresh = 0;
     if (send_ser){
+      digitalWrite(sendPin, HIGH);
       //send_ser = false;
       SendTwoByteInt(nISR);
       SendTwoByteInt(v_out);
       Serial1.write(10);
+      digitalWrite(sendPin, LOW);
     }
     if (nISR > 500){
       send_ser = false;
@@ -162,8 +168,10 @@ void loop()
 
 ISR(TIMER1_COMPA_vect)
 {     
+  digitalWrite(isrPin, HIGH);
   nISR++;
   //analogWrite(pwmA, v1);
   v_out = v1*v1;
   fresh = 1;
+  digitalWrite(isrPin, LOW);
 }

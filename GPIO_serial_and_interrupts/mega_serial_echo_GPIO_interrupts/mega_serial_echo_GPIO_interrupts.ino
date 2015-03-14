@@ -174,12 +174,12 @@ ISR(TIMER1_COMPA_vect)
     //was high, send low
     digitalWrite(isrPin, LOW);
     state = 0;
+    nISR++;
   }
   else if (state == 0){
     //was low, send high
     digitalWrite(isrPin, HIGH);
     state = 1;
   }
-  nISR++;
   //analogWrite(pwmA, v1);  
 }

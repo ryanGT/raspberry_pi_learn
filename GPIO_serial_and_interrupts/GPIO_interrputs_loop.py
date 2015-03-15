@@ -50,7 +50,7 @@ GPIO.setup(23, GPIO.IN, pull_up_down=up_down)
 
 print "Make sure you have a button connected so that when pressed"
 print "it will connect GPIO port 23 (pin 16) to GND (pin 6)\n"
-raw_input("Press Enter when ready\n>")
+#raw_input("Press Enter when ready\n>")
 
 print "Waiting for falling edge on port 23"
 # now the program will do nothing until the signal on port 23 
@@ -61,6 +61,12 @@ print "During this waiting time, your computer is not"
 print "wasting resources by polling for a button press.\n"
 print "Press your button when ready to initiate a falling edge interrupt."
 
+from matplotlib.pyplot import *
+from numpy import *
+import numpy, time
+
+import serial_utils
+
 N = 200
 
 nvect = zeros(N,dtype=int)
@@ -69,6 +75,7 @@ v_echo = zeros_like(nvect)
 
 serial_utils.WriteByte(ser, 2)#start new test
 
+t1 = time.time()
 
 for i in range(N):
     try:
@@ -87,6 +94,14 @@ for i in range(N):
     except KeyboardInterrupt:
         GPIO.cleanup()       # clean up GPIO on CTRL+C exit
 
+t2 = time.time()
+
+loop_time = t2-t1
+print('loop time = %0.4g' % loop_time)
+ave_dt = loop_time/N
+ave_freq = 1.0/ave_dt
+print('ave_dt = %0.4g' % ave_dt)
+print('ave_freq = %0.4g' % ave_freq)
 
 time.sleep(0.1)
 serial_utils.WriteByte(ser, 3)#stop test
@@ -97,3 +112,33 @@ serial_utils.WriteByte(ser, 3)#stop test
 GPIO.cleanup()           # clean up GPIO on normal exit
 
 ser.close()
+
+neg_inds = where(v_echo < 0)[0]
+v_echo[neg_inds] += 2**16
+
+test_vect = v1**2-v_echo
+
+if test_vect.any():
+    print('some failures:')
+    print(test_vect)
+else:
+    print('no failures')
+
+
+ntest = nvect == arange(N)
+ndiff = nvect - arange(N)
+
+if ntest.all():
+    print('n test passed')
+else:
+    print('n test failed:')
+    #print(nvect)
+    print(ndiff)
+
+
+figure(1)
+clf()
+plot(nvect, v1**2, nvect, v_echo, 'ro')
+
+
+show()

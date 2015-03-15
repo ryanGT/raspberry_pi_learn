@@ -61,9 +61,10 @@ void setup()
   //OCR1A = 100;//150ish - seems to work
   //OCR1A = 77;//200 Hz <-- seems very borderline (might be 184 Hz)
   //OCR1A = 51;//300 Hz
-  OCR1A = 38;//400 Hz <-- need double our actual, desired frequency
+  //OCR1A = 38;//400 Hz <-- need double our actual, desired frequency
   //OCR1A = 30;//500 Hz
-  //OCR1A = 15;//1000 Hz
+  //OCR1A = 19;//800 Hz
+  OCR1A = 15;//1000 Hz
   //OCR1A = 7;//2000 Hz
 
 

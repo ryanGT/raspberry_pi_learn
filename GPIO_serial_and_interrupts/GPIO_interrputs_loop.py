@@ -44,9 +44,11 @@ elif case == 2:
     up_down = GPIO.PUD_DOWN
     my_edge = GPIO.RISING
     msg1 = pat1 % 'Rising'
-    
-GPIO.setup(23, GPIO.IN, pull_up_down=up_down)
 
+my_test_pin = 24
+GPIO.setup(23, GPIO.IN, pull_up_down=up_down)
+GPIO.setup(my_test_pin, GPIO.OUT)
+GPIO.output(my_test_pin, 0)
 
 print "Make sure you have a button connected so that when pressed"
 print "it will connect GPIO port 23 (pin 16) to GND (pin 6)\n"
@@ -73,6 +75,7 @@ serial_utils.WriteByte(ser, 2)#start new test
 for i in range(N):
     try:
         GPIO.wait_for_edge(23, my_edge)
+        GPIO.output(my_test_pin, 1)
         serial_utils.WriteByte(ser, 1)#new n and voltage are coming
         serial_utils.WriteInt(ser, i)
         serial_utils.WriteInt(ser, v1[i])
@@ -82,6 +85,8 @@ for i in range(N):
         nl_check = serial_utils.Read_Byte(ser)
         assert nl_check == 10, "newline problem"
 
+        time.sleep(0.0001)
+        GPIO.output(my_test_pin, 0)
         #ser.write(i)
         #send_list([1,2,3,4])
     except KeyboardInterrupt:

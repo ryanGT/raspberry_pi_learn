@@ -13,26 +13,24 @@ import time
 import RPi.GPIO as GPIO
 
 # This is the GPIO number.  The actual board pin is number 11.
-PINOUT = 17
+#PINOUT = 17
+PINOUT = 24
 
-def main():
-    GPIO.setmode(GPIO.BCM) # Set to use GPIO nums, rather than physical board nums
-    GPIO.setup(PINOUT, GPIO.OUT)
-    print "Blink begins!  Press ctrl+c to exit"
-    try:
-        i = 1
-        while True:
-            GPIO.output(PINOUT, True)
-            print "Blink %s ON!!"%i
-            time.sleep(2)
-            GPIO.output(PINOUT, False)
-            print "Blink %s OFF!!"%i
-            time.sleep(2)
-            i += 1
-    except KeyboardInterrupt:
+GPIO.setmode(GPIO.BCM) # Set to use GPIO nums, rather than physical board nums
+GPIO.setup(PINOUT, GPIO.OUT)
+print "Blink begins!  Press ctrl+c to exit"
+try:
+    i = 1
+    while True:
+        GPIO.output(PINOUT, True)
+        print "Blink %s ON!!"%i
+        time.sleep(2)
         GPIO.output(PINOUT, False)
-        print "\nBlink DONE!"
-        return
+        print "Blink %s OFF!!"%i
+        time.sleep(2)
+        i += 1
+except KeyboardInterrupt:
+    GPIO.output(PINOUT, False)
+    GPIO.cleanup() 
+    print "\nBlink DONE!"
 
-if __name__ == "__main__":
-    main()
